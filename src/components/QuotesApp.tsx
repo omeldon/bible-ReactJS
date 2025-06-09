@@ -85,6 +85,7 @@ const ThemeSwitch = styled(Switch)(({ theme }) => ({
     "& .MuiSwitch-track": {
         borderRadius: 20,
         backgroundColor: "#ccc",
+        border: "1px solid grey",
     },
 }));
 
