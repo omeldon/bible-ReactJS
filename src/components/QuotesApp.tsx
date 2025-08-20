@@ -20,9 +20,7 @@ type Verse = {
   Reference: string;
   Verse: string;
 };
-
-// You can load your Bible verses data here
-// For now, we'll use an empty array and you can populate it with your actual data
+import versesDataJson from "../data/quotes.json";
 
 const emotions = [
   "happiness", "love", "excitement", "gratitude", "pride", "serenity",
