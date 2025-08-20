@@ -1,30 +1,18 @@
 import React, { useEffect, useState } from "react";
 import {
-  Box,
-  Button,
-  Card,
-  Typography,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
-  Switch,
-  IconButton,
-  Divider,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import WbSunnyIcon from "@mui/icons-material/WbSunny";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import ShareIcon from "@mui/icons-material/Share";
-import ShuffleIcon from "@mui/icons-material/Shuffle";
-import SearchIcon from "@mui/icons-material/Search";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import versesDataJson from "../data/quotes.json";
+  Sun,
+  Moon,
+  Search,
+  Heart,
+  Share2,
+  Copy,
+  RefreshCw,
+  BookOpen,
+  Calendar,
+  Star,
+  Filter,
+  Shuffle,
+} from "lucide-react";
 
 type Verse = {
   Emotion: string;
@@ -32,278 +20,122 @@ type Verse = {
   Verse: string;
 };
 
-const emotions = [
-  "happiness", "love", "excitement", "gratitude", "pride", "serenity",
-  "amusement", "joy", "hope", "contentment", "sadness", "anger",
-  "fear", "disgust", "jealousy", "guilt", "shame", "frustration",
-  "despair", "anxiety", "confusion", "surprise", "empathy", "awe",
-  "relief", "nostalgia", "regret", "envy", "compassion",
-];
-
-// Daily verses
-const dailyVerses: Verse[] = [
-  {
-    Emotion: "Hope",
-    Reference: "Jeremiah 29:11",
-    Verse: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, to give you hope and a future."
-  },
-  {
-    Emotion: "Faith",
-    Reference: "Romans 8:28",
-    Verse: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose."
-  },
-  {
-    Emotion: "Strength",
-    Reference: "Isaiah 40:31",
-    Verse: "But those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint."
-  }
-];
-
-// Theme Switch (with icons)
-const ThemeSwitch = styled(Switch)(({ theme }) => ({
-  width: 62,
-  height: 34,
-  padding: 7,
-  "& .MuiSwitch-switchBase": {
-    padding: 6,
-    "&.Mui-checked": {
-      transform: "translateX(28px)",
-      color: "#fff",
-      "& + .MuiSwitch-track": {
-        backgroundColor: "#333",
-      },
-    },
-  },
-  "& .MuiSwitch-thumb": {
-    backgroundColor: theme.palette.mode === "dark" ? "#fff" : "#000",
-    width: 22,
-    height: 22,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    "& svg": {
-      fontSize: 16,
-      color: theme.palette.mode === "dark" ? "#000" : "#fff",
-    },
-  },
-  "& .MuiSwitch-track": {
-    borderRadius: 20,
-    backgroundColor: "#ccc",
-    border: "1px solid grey",
-  },
-}));
-
 const QuotesApp: React.FC = () => {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [versesData, setVersesData] = useState<Verse[]>([]);
+  const [verses, setVerses] = useState<Verse[]>([]);
+  const [filteredVerses, setFilteredVerses] = useState<Verse[]>([]);
   const [selectedEmotion, setSelectedEmotion] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [displayVerse, setDisplayVerse] = useState<Verse | null>(null);
-  const [dailyVerse, setDailyVerse] = useState<Verse | null>(null);
-  const [favorites, setFavorites] = useState<Verse[]>([]);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
 
-  // init theme + data
+  // Load verses.json
   useEffect(() => {
-    const savedTheme = (localStorage.getItem("theme") as "light" | "dark") || "light";
-    setTheme(savedTheme);
-    document.body.classList.toggle("dark", savedTheme === "dark");
-
-    setVersesData(versesDataJson);
-
-    const today = new Date().getDate();
-    setDailyVerse(dailyVerses[today % dailyVerses.length]);
+    fetch("/verses.json")
+      .then((res) => res.json())
+      .then((data) => {
+        setVerses(data);
+        setFilteredVerses(data);
+      });
   }, []);
 
-  useEffect(() => {
-    document.body.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  const handleEmotionChange = (event: SelectChangeEvent) => {
-    setSelectedEmotion(event.target.value);
-    setDisplayVerse(null);
-    setErrorMsg("");
-  };
-
-  const searchByEmotion = () => {
-    if (!selectedEmotion) return setErrorMsg("Please select an emotion.");
-
-    const filtered = versesData.filter(
-      (v) => v.Emotion?.trim().toLowerCase() === selectedEmotion.toLowerCase()
+  // Filter by emotion
+  const handleEmotionSelect = (emotion: string) => {
+    setSelectedEmotion(emotion);
+    setFilteredVerses(
+      emotion ? verses.filter((v) => v.Emotion === emotion) : verses
     );
-
-    if (filtered.length > 0) {
-      setDisplayVerse(filtered[Math.floor(Math.random() * filtered.length)]);
-      setErrorMsg("");
-    } else {
-      setDisplayVerse(null);
-      setErrorMsg("No verse found for this emotion.");
-    }
   };
 
-  const searchByKeyword = () => {
-    if (!searchKeyword.trim()) return setErrorMsg("Please enter a keyword.");
-
-    const filtered = versesData.filter(
-      (v) =>
-        v.Verse.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        v.Reference.toLowerCase().includes(searchKeyword.toLowerCase())
-    );
-
-    if (filtered.length > 0) {
-      setDisplayVerse(filtered[Math.floor(Math.random() * filtered.length)]);
-      setErrorMsg("");
-    } else {
-      setDisplayVerse(null);
-      setErrorMsg("No verse found with that keyword.");
-    }
+  // Shuffle verses
+  const handleShuffle = () => {
+    setFilteredVerses([...filteredVerses].sort(() => Math.random() - 0.5));
   };
 
-  const getRandomVerse = () => {
-    if (versesData.length === 0) return;
-    setDisplayVerse(versesData[Math.floor(Math.random() * versesData.length)]);
-    setErrorMsg("");
-  };
-
-  const toggleFavorite = (verse: Verse) => {
-    const isFav = favorites.some(
-      (f) => f.Reference === verse.Reference && f.Verse === verse.Verse
-    );
-    if (isFav) {
-      setFavorites(favorites.filter((f) => f.Reference !== verse.Reference));
-    } else {
-      setFavorites([...favorites, verse]);
-    }
+  // Copy verse to clipboard
+  const handleCopy = (verse: Verse) => {
+    navigator.clipboard.writeText(`${verse.Verse} — ${verse.Reference}`);
+    alert("Copied to clipboard!");
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        bgcolor: theme === "dark" ? "#121212" : "#e5e4e2",
-        color: theme === "dark" ? "#fff" : "#000",
-        transition: "all 0.3s ease",
-        px: { xs: 2, sm: 4 },
-        py: { xs: 3, sm: 5 },
-        position: "relative",
-      }}
-    >
-      {/* Theme Toggle */}
-      <Box sx={{ position: "absolute", top: 16, right: 16 }}>
-        <ThemeSwitch
-          checked={theme === "dark"}
-          onChange={() => setTheme(theme === "dark" ? "light" : "dark")}
-          icon={<WbSunnyIcon style={{ color: "gold" }} />}
-          checkedIcon={<DarkModeIcon />}
-        />
-      </Box>
+    <div className={darkMode ? "bg-gray-900 text-white min-h-screen" : "bg-gray-100 text-gray-900 min-h-screen"}>
+      {/* Navbar */}
+      <nav className="flex justify-between items-center px-6 py-4 shadow-md bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          <BookOpen className="w-6 h-6 text-yellow-300" /> Daily Inspiration
+        </h1>
+        <div className="flex items-center gap-4">
+          <button onClick={() => setDarkMode(!darkMode)}>
+            {darkMode ? (
+              <Sun className="w-6 h-6 text-yellow-400" />
+            ) : (
+              <Moon className="w-6 h-6 text-blue-300" />
+            )}
+          </button>
+          <Search className="w-6 h-6 text-white" />
+        </div>
+      </nav>
 
-      {/* Header */}
-      <Box textAlign="center" mb={4}>
-        <Typography variant="h4" fontWeight="bold">
-          Bible Verses
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary">
-          Find comfort and guidance through God's word
-        </Typography>
-      </Box>
+      {/* Filters */}
+      <div className="flex justify-center gap-3 p-4 flex-wrap">
+        <button
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600"
+          onClick={() => handleEmotionSelect("")}
+        >
+          <Filter className="w-5 h-5 text-yellow-200" /> All
+        </button>
+        <button
+          className="flex items-center gap-2 px-4 py-2 bg-pink-500 text-white rounded-xl hover:bg-pink-600"
+          onClick={() => handleEmotionSelect("Love")}
+        >
+          <Heart className="w-5 h-5 text-red-200" /> Love
+        </button>
+        <button
+          className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600"
+          onClick={() => handleEmotionSelect("Faith")}
+        >
+          <Star className="w-5 h-5 text-yellow-300" /> Faith
+        </button>
+        <button
+          className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-xl hover:bg-purple-600"
+          onClick={() => handleEmotionSelect("Hope")}
+        >
+          <Calendar className="w-5 h-5 text-blue-200" /> Hope
+        </button>
+        <button
+          className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600"
+          onClick={handleShuffle}
+        >
+          <Shuffle className="w-5 h-5 text-yellow-200" /> Shuffle
+        </button>
+      </div>
 
-      {/* Daily Verse */}
-      {dailyVerse && (
-        <Card sx={{ p: 3, mb: 4 }}>
-          <Box display="flex" alignItems="center" gap={1} mb={2}>
-            <CalendarTodayIcon color="primary" />
-            <Typography variant="h6">Verse of the Day</Typography>
-          </Box>
-          <Typography variant="body1" fontStyle="italic" mb={1}>
-            "{dailyVerse.Verse}"
-          </Typography>
-          <Typography variant="subtitle2" color="primary">
-            - {dailyVerse.Reference}
-          </Typography>
-        </Card>
-      )}
-
-      {/* Search Section */}
-      <Card sx={{ p: 3, mb: 4 }}>
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel>Select Emotion</InputLabel>
-          <Select
-            value={selectedEmotion}
-            label="Select Emotion"
-            onChange={handleEmotionChange}
+      {/* Quotes Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+        {filteredVerses.map((verse, idx) => (
+          <div
+            key={idx}
+            className="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-800 dark:text-white flex flex-col justify-between"
           >
-            <MenuItem value="">
-              <em>-- Choose an Emotion --</em>
-            </MenuItem>
-            {emotions.map((emo) => (
-              <MenuItem key={emo} value={emo}>
-                {emo.charAt(0).toUpperCase() + emo.slice(1)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Search by keyword..."
-          value={searchKeyword}
-          onChange={(e) => setSearchKeyword(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && searchByKeyword()}
-          sx={{ mb: 2 }}
-        />
-
-        <Box display="flex" gap={2} flexWrap="wrap">
-          <Button variant="contained" startIcon={<SearchIcon />} onClick={searchByEmotion}>
-            Search Emotion
-          </Button>
-          <Button variant="contained" color="success" startIcon={<SearchIcon />} onClick={searchByKeyword}>
-            Search Keyword
-          </Button>
-          <Button variant="contained" color="secondary" startIcon={<ShuffleIcon />} onClick={getRandomVerse}>
-            Random Verse
-          </Button>
-        </Box>
-      </Card>
-
-      {/* Results */}
-      <Card sx={{ p: 3, minHeight: 150 }}>
-        {errorMsg ? (
-          <Typography color="error">{errorMsg}</Typography>
-        ) : displayVerse ? (
-          <Box textAlign="center">
-            <Typography variant="h6" gutterBottom>
-              {displayVerse.Reference}
-            </Typography>
-            <Typography variant="body1" fontStyle="italic" gutterBottom>
-              "{displayVerse.Verse}"
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <Box display="flex" justifyContent="center" gap={2}>
-              <IconButton onClick={() => toggleFavorite(displayVerse)}>
-                {favorites.some((f) => f.Reference === displayVerse.Reference) ? (
-                  <FavoriteIcon color="error" />
-                ) : (
-                  <FavoriteBorderIcon />
-                )}
-              </IconButton>
-              <IconButton onClick={() => navigator.clipboard.writeText(`"${displayVerse.Verse}" - ${displayVerse.Reference}`)}>
-                <ContentCopyIcon />
-              </IconButton>
-              <IconButton>
-                <ShareIcon />
-              </IconButton>
-            </Box>
-          </Box>
-        ) : (
-          <Typography textAlign="center" color="text.secondary">
-            Select an emotion, enter a keyword, or click random verse to begin.
-          </Typography>
-        )}
-      </Card>
-    </Box>
+            <p className="text-lg italic mb-4">“{verse.Verse}”</p>
+            <div className="flex justify-between items-center">
+              <span className="font-semibold text-indigo-600 dark:text-indigo-300">
+                {verse.Reference}
+              </span>
+              <div className="flex gap-3">
+                <button onClick={() => handleCopy(verse)}>
+                  <Copy className="w-5 h-5 text-gray-500 hover:text-indigo-500" />
+                </button>
+                <button>
+                  <Share2 className="w-5 h-5 text-gray-500 hover:text-indigo-500" />
+                </button>
+                <button>
+                  <RefreshCw className="w-5 h-5 text-gray-500 hover:text-indigo-500" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 
