@@ -14,7 +14,7 @@ import {
   Filter,
   Shuffle
 } from "lucide-react";
-
+import versesDataJson from "../data/quotes.json";
 type Verse = {
   Emotion: string;
   Reference: string;
