@@ -9,7 +9,6 @@ import {
   RefreshCw, 
   BookOpen, 
   Calendar,
-  Star,
   ChevronDown,
   Filter,
   Shuffle
@@ -20,7 +19,22 @@ type Verse = {
   Reference: string;
   Verse: string;
 };
-import versesDataJson from "../data/quotes.json";
+
+// Sample verses data from your JSON structure
+const sampleVerses: Verse[] = [
+  {"Emotion":"Happiness","Reference":"Psalm 144:15","Verse":"Blessed are the people whose God is the Lord!"},
+  {"Emotion":"Happiness","Reference":"Proverbs 16:20","Verse":"Whoever gives thought to the word will discover good, and blessed is he who trusts in the Lord."},
+  {"Emotion":"Happiness","Reference":"John 16:22","Verse":"So also you have sorrow now, but I will see you again, and your hearts will rejoice."},
+  {"Emotion":"Happiness","Reference":"Philippians 4:4","Verse":"Rejoice in the Lord always; again I will say, rejoice."},
+  {"Emotion":"Happiness","Reference":"Psalm 118:24","Verse":"This is the day that the Lord has made; let us rejoice and be glad in it."},
+  {"Emotion":"Happiness","Reference":"Psalm 126:5","Verse":"Those who sow with tears will reap with songs of joy."},
+  {"Emotion":"Happiness","Reference":"Romans 15:13","Verse":"May the God of hope fill you with all joy and peace as you trust in Him."},
+  {"Emotion":"Happiness","Reference":"Nehemiah 8:10","Verse":"The joy of the Lord is your strength."},
+  {"Emotion":"Love","Reference":"1 John 4:19","Verse":"We love because he first loved us."},
+  {"Emotion":"Fear","Reference":"Joshua 1:9","Verse":"Have I not commanded you? Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go."},
+  {"Emotion":"Sadness","Reference":"Psalm 34:18","Verse":"The Lord is close to the brokenhearted and saves those who are crushed in spirit."},
+  {"Emotion":"Anxiety","Reference":"Philippians 4:6-7","Verse":"Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus."}
+];
 
 const emotions = [
   "happiness", "love", "excitement", "gratitude", "pride", "serenity",
@@ -30,15 +44,27 @@ const emotions = [
   "relief", "nostalgia", "regret", "envy", "compassion"
 ];
 
-// Replace with your actual daily verses from your JSON data
-const dailyVerses = [
-  // You can populate this with actual verses from your JSON
-  // For now, this will be empty until you add your real verses
+const dailyVerses: Verse[] = [
+  {
+    Emotion: "Hope",
+    Reference: "Jeremiah 29:11",
+    Verse: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, to give you hope and a future."
+  },
+  {
+    Emotion: "Faith",
+    Reference: "Romans 8:28",
+    Verse: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose."
+  },
+  {
+    Emotion: "Strength",
+    Reference: "Isaiah 40:31",
+    Verse: "But those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint."
+  }
 ];
 
 const QuotesApp: React.FC = () => {
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [versesData, setVersesData] = useState<Verse[]>([]);
+  const [versesData, setVersesData] = useState<Verse[]>(sampleVerses);
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [displayVerse, setDisplayVerse] = useState<Verse | null>(null);
@@ -52,37 +78,21 @@ const QuotesApp: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
+    // Initialize theme without localStorage
+    const savedTheme = "light"; // Default to light theme
+    setTheme(savedTheme);
 
-    // Load favorites from memory
-    const savedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    // Initialize favorites without localStorage
+    const savedFavorites: Verse[] = []; // Start with empty favorites
     setFavorites(savedFavorites);
 
-    // TODO: Replace this with your actual verses data
-    // You can either:
-    // 1. Paste your JSON data directly into a variable here
-    // 2. Use a fetch request to load from an API
-    // 3. Copy-paste your verses into the versesData state
-    
-    // Example: setVersesData(yourActualBibleVersesArray);
-    
-    // Set daily verse from your actual data (when available)
-    // if (yourVersesData.length > 0) {
-    //   const today = new Date().getDate();
-    //   setDailyVerse(yourVersesData[today % yourVersesData.length]);
-    // }
+    // Set daily verse
+    const today = new Date().getDate();
+    setDailyVerse(dailyVerses[today % dailyVerses.length]);
+
+    // Load verses data (in a real app, you'd load from quotes.json here)
+    setVersesData(sampleVerses);
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  useEffect(() => {
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-  }, [favorites]);
 
   const handleEmotionChange = (emotion: string) => {
     setSelectedEmotion(emotion);
@@ -94,11 +104,6 @@ const QuotesApp: React.FC = () => {
   const searchByEmotion = () => {
     if (!selectedEmotion) {
       setErrorMsg("Please select an emotion.");
-      return;
-    }
-
-    if (versesData.length === 0) {
-      setErrorMsg("Verse data not loaded yet. Please make sure your JSON file is imported.");
       return;
     }
 
@@ -128,11 +133,6 @@ const QuotesApp: React.FC = () => {
       return;
     }
 
-    if (versesData.length === 0) {
-      setErrorMsg("Verse data not loaded yet. Please make sure your JSON file is imported.");
-      return;
-    }
-
     setIsLoading(true);
 
     setTimeout(() => {
@@ -155,11 +155,6 @@ const QuotesApp: React.FC = () => {
   };
 
   const getRandomVerse = () => {
-    if (versesData.length === 0) {
-      setErrorMsg("Verse data not loaded yet. Please make sure your JSON file is imported.");
-      return;
-    }
-
     setIsLoading(true);
     setTimeout(() => {
       const randomVerse = versesData[Math.floor(Math.random() * versesData.length)];
@@ -521,11 +516,15 @@ const QuotesApp: React.FC = () => {
       </div>
 
       <style>{`
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-`}</style>
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+      `}</style>
     </div>
   );
 };
