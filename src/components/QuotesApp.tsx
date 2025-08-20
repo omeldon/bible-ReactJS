@@ -3,7 +3,7 @@ import {
   Sun, Moon, Search, Heart, Share2, Copy, RefreshCw, 
   BookOpen, Calendar, ChevronDown, Filter, Shuffle
 } from "lucide-react";
-import versesDataJson from "../data/quotes.json"; // ✅ your JSON file
+import versesDataJson from "../data/quotes.json";
 
 type Verse = {
   Emotion: string;
