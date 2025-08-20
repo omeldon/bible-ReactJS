@@ -19,6 +19,7 @@
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
     "autoprefixer": "^10.4.21",
+    "lucide-react": "^0.540.0",
     "postcss": "^8.5.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -31,7 +32,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "scripts": {
+      "start": "react-scripts start",
+      "dev": "vite"
+    }
   },
   "eslintConfig": {
     "extends": [
