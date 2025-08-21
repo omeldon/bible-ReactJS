@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { 
-  Sun, 
-  Moon, 
-  Search, 
-  Heart, 
-  Share2, 
-  Copy, 
-  RefreshCw, 
-  BookOpen, 
+import bookImage from "../images/book001.png";
+import {
+  Sun,
+  Moon,
+  Search,
+  Heart,
+  Share2,
+  Copy,
+  RefreshCw,
+  BookOpen,
   ChevronDown,
   Filter,
-  Shuffle
+  Shuffle,
 } from "lucide-react";
 
-import quotesData from '../data/quotes.json';
-
+import quotesData from "../data/quotes.json";
 type Verse = {
   Emotion?: string;
   Reference: string;
@@ -22,17 +22,52 @@ type Verse = {
 };
 
 const emotions = [
-  "happiness", "love", "excitement", "gratitude", "pride", "serenity",
-  "amusement", "joy", "hope", "contentment", "sadness", "anger",
-  "fear", "disgust", "jealousy", "guilt", "shame", "frustration",
-  "despair", "anxiety", "confusion", "surprise", "empathy", "awe",
-  "relief", "nostalgia", "regret", "envy", "compassion", "peace", "strength"
+  "happiness",
+  "love",
+  "excitement",
+  "gratitude",
+  "pride",
+  "serenity",
+  "amusement",
+  "joy",
+  "hope",
+  "contentment",
+  "sadness",
+  "anger",
+  "fear",
+  "disgust",
+  "jealousy",
+  "guilt",
+  "shame",
+  "frustration",
+  "despair",
+  "anxiety",
+  "confusion",
+  "surprise",
+  "empathy",
+  "awe",
+  "relief",
+  "nostalgia",
+  "regret",
+  "envy",
+  "compassion",
+  "peace",
+  "strength",
 ];
 
+interface QuotesAppProps {
+  theme: "light" | "dark";
+  onThemeToggle: () => void;
+  isNavbarOpen: boolean;
+  onNavbarToggle: () => void;
+}
 
-
-const QuotesApp: React.FC = () => {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+const QuotesApp: React.FC<QuotesAppProps> = ({
+  theme,
+  onThemeToggle,
+  isNavbarOpen,
+  onNavbarToggle,
+}) => {
   const [versesData, setVersesData] = useState<Verse[]>([]);
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -46,12 +81,8 @@ const QuotesApp: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Initialize theme without localStorage
-    const savedTheme = "light"; // Default to light theme
-    setTheme(savedTheme);
-
     // Initialize favorites without localStorage
-    const savedFavorites: Verse[] = []; // Start with empty favorites
+    const savedFavorites: Verse[] = [];
     setFavorites(savedFavorites);
 
     // Load verses data from imported JSON
@@ -70,17 +101,15 @@ const QuotesApp: React.FC = () => {
       setErrorMsg("Please select an emotion.");
       return;
     }
-
     setIsLoading(true);
-    
     // Simulate loading
     setTimeout(() => {
       const filtered = versesData.filter(
         (v) => v.Emotion?.trim().toLowerCase() === selectedEmotion.toLowerCase()
       );
-
       if (filtered.length > 0) {
-        const randomVerse = filtered[Math.floor(Math.random() * filtered.length)];
+        const randomVerse =
+          filtered[Math.floor(Math.random() * filtered.length)];
         setDisplayVerse(randomVerse);
         setErrorMsg("");
       } else {
@@ -96,23 +125,23 @@ const QuotesApp: React.FC = () => {
       setErrorMsg("Please enter a keyword to search.");
       return;
     }
-
     setIsLoading(true);
-
     setTimeout(() => {
       const filtered = versesData.filter(
-        (v) => 
+        (v) =>
           v.Verse.toLowerCase().includes(searchKeyword.toLowerCase()) ||
           v.Reference.toLowerCase().includes(searchKeyword.toLowerCase())
       );
-
       if (filtered.length > 0) {
-        const randomVerse = filtered[Math.floor(Math.random() * filtered.length)];
+        const randomVerse =
+          filtered[Math.floor(Math.random() * filtered.length)];
         setDisplayVerse(randomVerse);
         setErrorMsg("");
       } else {
         setDisplayVerse(null);
-        setErrorMsg("No verse found containing that keyword. Try a different search!");
+        setErrorMsg(
+          "No verse found containing that keyword. Try a different search!"
+        );
       }
       setIsLoading(false);
     }, 500);
@@ -121,7 +150,8 @@ const QuotesApp: React.FC = () => {
   const getRandomVerse = () => {
     setIsLoading(true);
     setTimeout(() => {
-      const randomVerse = versesData[Math.floor(Math.random() * versesData.length)];
+      const randomVerse =
+        versesData[Math.floor(Math.random() * versesData.length)];
       setDisplayVerse(randomVerse);
       setErrorMsg("");
       setIsLoading(false);
@@ -129,14 +159,16 @@ const QuotesApp: React.FC = () => {
   };
 
   const toggleFavorite = (verse: Verse) => {
-    const isAlreadyFavorite = favorites.some(fav => 
-      fav.Reference === verse.Reference && fav.Verse === verse.Verse
+    const isAlreadyFavorite = favorites.some(
+      (fav) => fav.Reference === verse.Reference && fav.Verse === verse.Verse
     );
-
     if (isAlreadyFavorite) {
-      setFavorites(favorites.filter(fav => 
-        !(fav.Reference === verse.Reference && fav.Verse === verse.Verse)
-      ));
+      setFavorites(
+        favorites.filter(
+          (fav) =>
+            !(fav.Reference === verse.Reference && fav.Verse === verse.Verse)
+        )
+      );
     } else {
       setFavorites([...favorites, verse]);
     }
@@ -149,23 +181,22 @@ const QuotesApp: React.FC = () => {
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text: ', err);
+      console.error("Failed to copy text: ", err);
     }
   };
 
   const shareVerse = async (verse: Verse) => {
     const text = `"${verse.Verse}" - ${verse.Reference}`;
-    
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Bi-Verse',
+          title: "Bi-Verse",
           text: text,
         });
         setShareSuccess(true);
         setTimeout(() => setShareSuccess(false), 2000);
       } catch (err) {
-        console.error('Error sharing:', err);
+        console.error("Error sharing:", err);
       }
     } else {
       // Fallback: copy to clipboard
@@ -174,21 +205,23 @@ const QuotesApp: React.FC = () => {
   };
 
   const isFavorite = (verse: Verse) => {
-    return favorites.some(fav => 
-      fav.Reference === verse.Reference && fav.Verse === verse.Verse
+    return favorites.some(
+      (fav) => fav.Reference === verse.Reference && fav.Verse === verse.Verse
     );
   };
 
   return (
-    <div className={`min-h-screen transition-all duration-500 ${
-      theme === "dark" 
-        ? "bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white" 
-        : "bg-gradient-to-br from-blue-50 via-white to-purple-50 text-gray-900"
-    }`}>
+    <div
+      className={`min-h-screen transition-all duration-500 ${
+        theme === "dark"
+          ? "bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white"
+          : "bg-gradient-to-br from-blue-50 via-white to-purple-50 text-gray-900"
+      }`}
+    >
       {/* Theme Toggle */}
       <div className="absolute top-4 right-4 z-10">
         <button
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onClick={onThemeToggle}
           className={`p-3 rounded-full transition-all duration-300 ${
             theme === "dark"
               ? "bg-yellow-500 text-gray-900 hover:bg-yellow-400"
@@ -205,15 +238,16 @@ const QuotesApp: React.FC = () => {
           <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Bi-Verse
           </h1>
-          
         </div>
 
         {/* Search Section */}
-        <div className={`mb-8 p-6 rounded-2xl shadow-lg transition-all duration-300 ${
-          theme === "dark" 
-            ? "bg-white/10 backdrop-blur-sm border border-white/20" 
-            : "bg-white/80 backdrop-blur-sm border border-gray-200"
-        }`}>
+        <div
+          className={`mb-8 p-6 rounded-2xl shadow-lg transition-all duration-300 ${
+            theme === "dark"
+              ? "bg-white/10 backdrop-blur-sm border border-white/20"
+              : "bg-white/80 backdrop-blur-sm border border-gray-200"
+          }`}
+        >
           {/* Navigation Tabs */}
           <div className="flex flex-wrap gap-2 mb-6">
             <button
@@ -248,7 +282,9 @@ const QuotesApp: React.FC = () => {
             <div className="space-y-4">
               {/* Emotion Search */}
               <div>
-                <label className="block text-sm font-medium mb-2">Search by Emotion</label>
+                <label className="block text-sm font-medium mb-2">
+                  Search by Emotion
+                </label>
                 <div className="relative">
                   <button
                     onClick={() => setShowDropdown(!showDropdown)}
@@ -259,23 +295,34 @@ const QuotesApp: React.FC = () => {
                     }`}
                   >
                     <span className={selectedEmotion ? "" : "text-gray-500"}>
-                      {selectedEmotion ? selectedEmotion.charAt(0).toUpperCase() + selectedEmotion.slice(1) : "Select an emotion"}
+                      {selectedEmotion
+                        ? selectedEmotion.charAt(0).toUpperCase() +
+                          selectedEmotion.slice(1)
+                        : "Select an emotion"}
                     </span>
-                    <ChevronDown size={20} className={`transition-transform ${showDropdown ? "rotate-180" : ""}`} />
+                    <ChevronDown
+                      size={20}
+                      className={`transition-transform ${
+                        showDropdown ? "rotate-180" : ""
+                      }`}
+                    />
                   </button>
-                  
                   {showDropdown && (
-                    <div className={`absolute z-20 w-full mt-1 max-h-48 overflow-y-auto rounded-lg border shadow-lg ${
-                      theme === "dark"
-                        ? "bg-gray-800 border-white/30"
-                        : "bg-white border-gray-300"
-                    }`}>
+                    <div
+                      className={`absolute z-20 w-full mt-1 max-h-48 overflow-y-auto rounded-lg border shadow-lg ${
+                        theme === "dark"
+                          ? "bg-gray-800 border-white/30"
+                          : "bg-white border-gray-300"
+                      }`}
+                    >
                       {emotions.map((emotion) => (
                         <button
                           key={emotion}
                           onClick={() => handleEmotionChange(emotion)}
                           className={`w-full p-3 text-left hover:bg-blue-600 hover:text-white transition-all ${
-                            selectedEmotion === emotion ? "bg-blue-600 text-white" : ""
+                            selectedEmotion === emotion
+                              ? "bg-blue-600 text-white"
+                              : ""
                           }`}
                         >
                           {emotion.charAt(0).toUpperCase() + emotion.slice(1)}
@@ -288,7 +335,9 @@ const QuotesApp: React.FC = () => {
 
               {/* Keyword Search */}
               <div>
-                <label className="block text-sm font-medium mb-2">Search by Keyword</label>
+                <label className="block text-sm font-medium mb-2">
+                  Search by Keyword
+                </label>
                 <input
                   type="text"
                   value={searchKeyword}
@@ -299,7 +348,7 @@ const QuotesApp: React.FC = () => {
                       ? "bg-white/10 border-white/30 placeholder-gray-400 hover:bg-white/20"
                       : "bg-white border-gray-300 hover:border-gray-400"
                   }`}
-                  onKeyPress={(e) => e.key === 'Enter' && searchByKeyword()}
+                  onKeyPress={(e) => e.key === "Enter" && searchByKeyword()}
                 />
               </div>
 
@@ -310,7 +359,11 @@ const QuotesApp: React.FC = () => {
                   disabled={isLoading}
                   className="flex-1 min-w-[120px] bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {isLoading ? <RefreshCw size={16} className="animate-spin" /> : <Filter size={16} />}
+                  {isLoading ? (
+                    <RefreshCw size={16} className="animate-spin" />
+                  ) : (
+                    <Filter size={16} />
+                  )}
                   Search Emotion
                 </button>
                 <button
@@ -318,7 +371,11 @@ const QuotesApp: React.FC = () => {
                   disabled={isLoading}
                   className="flex-1 min-w-[120px] bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {isLoading ? <RefreshCw size={16} className="animate-spin" /> : <Search size={16} />}
+                  {isLoading ? (
+                    <RefreshCw size={16} className="animate-spin" />
+                  ) : (
+                    <Search size={16} />
+                  )}
                   Search Keyword
                 </button>
                 <button
@@ -326,7 +383,11 @@ const QuotesApp: React.FC = () => {
                   disabled={isLoading}
                   className="flex-1 min-w-[120px] bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {isLoading ? <RefreshCw size={16} className="animate-spin" /> : <Shuffle size={16} />}
+                  {isLoading ? (
+                    <RefreshCw size={16} className="animate-spin" />
+                  ) : (
+                    <Shuffle size={16} />
+                  )}
                   Random Verse
                 </button>
               </div>
@@ -336,8 +397,17 @@ const QuotesApp: React.FC = () => {
             <div>
               {favorites.length === 0 ? (
                 <div className="text-center py-8">
-                  <Heart size={48} className={`mx-auto mb-4 ${theme === "dark" ? "text-gray-400" : "text-gray-300"}`} />
-                  <p className={theme === "dark" ? "text-gray-400" : "text-gray-600"}>
+                  <Heart
+                    size={48}
+                    className={`mx-auto mb-4 ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-300"
+                    }`}
+                  />
+                  <p
+                    className={
+                      theme === "dark" ? "text-gray-400" : "text-gray-600"
+                    }
+                  >
                     No favorite verses yet. Add some by clicking the heart icon!
                   </p>
                 </div>
@@ -352,10 +422,16 @@ const QuotesApp: React.FC = () => {
                           : "bg-white border-gray-200 hover:shadow-md"
                       }`}
                     >
-                      <p className={`text-lg mb-2 ${theme === "dark" ? "text-gray-200" : "text-gray-700"}`}>
+                      <p
+                        className={`text-lg mb-2 ${
+                          theme === "dark" ? "text-gray-200" : "text-gray-700"
+                        }`}
+                      >
                         "{verse.Verse}"
                       </p>
-                      <p className="font-semibold text-blue-600 mb-3">- {verse.Reference}</p>
+                      <p className="font-semibold text-blue-600 mb-3">
+                        - {verse.Reference}
+                      </p>
                       <div className="flex gap-2">
                         <button
                           onClick={() => toggleFavorite(verse)}
@@ -385,11 +461,13 @@ const QuotesApp: React.FC = () => {
         </div>
 
         {/* Results Section */}
-        <div className={`p-6 rounded-2xl shadow-lg min-h-[200px] flex flex-col justify-center transition-all duration-300 ${
-          theme === "dark" 
-            ? "bg-white/10 backdrop-blur-sm border border-white/20" 
-            : "bg-white/80 backdrop-blur-sm border border-gray-200"
-        }`}>
+        <div
+          className={`p-6 rounded-2xl shadow-lg min-h-[200px] flex flex-col justify-center transition-all duration-300 ${
+            theme === "dark"
+              ? "bg-white/10 backdrop-blur-sm border border-white/20"
+              : "bg-white/80 backdrop-blur-sm border border-gray-200"
+          }`}
+        >
           {errorMsg ? (
             <div className="text-center">
               <div className="text-red-500 text-lg mb-2">❌</div>
@@ -399,11 +477,15 @@ const QuotesApp: React.FC = () => {
             <div className="text-center animate-fade-in">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <BookOpen className="text-blue-500" size={24} />
-                <h3 className="text-xl font-semibold">{displayVerse.Reference}</h3>
+                <h3 className="text-xl font-semibold">
+                  {displayVerse.Reference}
+                </h3>
               </div>
-              <p className={`text-xl md:text-2xl leading-relaxed mb-6 italic ${
-                theme === "dark" ? "text-gray-200" : "text-gray-700"
-              }`}>
+              <p
+                className={`text-xl md:text-2xl leading-relaxed mb-6 italic ${
+                  theme === "dark" ? "text-gray-200" : "text-gray-700"
+                }`}
+              >
                 "{displayVerse.Verse}"
               </p>
               <div className="flex justify-center gap-4">
@@ -417,13 +499,20 @@ const QuotesApp: React.FC = () => {
                       : "text-gray-600 hover:text-red-500"
                   }`}
                 >
-                  <Heart size={20} fill={isFavorite(displayVerse) ? "currentColor" : "none"} />
+                  <Heart
+                    size={20}
+                    fill={isFavorite(displayVerse) ? "currentColor" : "none"}
+                  />
                   {isFavorite(displayVerse) ? "Favorited" : "Add to Favorites"}
                 </button>
                 <button
                   onClick={() => copyToClipboard(displayVerse)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                    copySuccess ? "text-green-500" : theme === "dark" ? "text-gray-400 hover:text-blue-500" : "text-gray-600 hover:text-blue-500"
+                    copySuccess
+                      ? "text-green-500"
+                      : theme === "dark"
+                      ? "text-gray-400 hover:text-blue-500"
+                      : "text-gray-600 hover:text-blue-500"
                   }`}
                 >
                   <Copy size={20} />
@@ -432,7 +521,11 @@ const QuotesApp: React.FC = () => {
                 <button
                   onClick={() => shareVerse(displayVerse)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                    shareSuccess ? "text-green-500" : theme === "dark" ? "text-gray-400 hover:text-green-500" : "text-gray-600 hover:text-green-500"
+                    shareSuccess
+                      ? "text-green-500"
+                      : theme === "dark"
+                      ? "text-gray-400 hover:text-green-500"
+                      : "text-gray-600 hover:text-green-500"
                   }`}
                 >
                   <Share2 size={20} />
@@ -442,9 +535,22 @@ const QuotesApp: React.FC = () => {
             </div>
           ) : (
             <div className="text-center">
-              <div className={`text-6xl mb-4 ${theme === "dark" ? "text-gray-600" : "text-gray-300"}`}>📖</div>
-              <p className={`text-lg ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
-                Select an emotion, search by keyword, or get a random verse to begin.
+              <div className={`mb-4 flex justify-center`}>
+                <img
+                  src={bookImage}
+                  alt="Book Icon"
+                  className={`w-20 h-20 ${
+                    theme === "dark" ? "opacity-70" : "opacity-70"
+                  }`}
+                />
+              </div>
+              <p
+                className={`text-lg ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                Select an emotion, search by keyword, or get a random verse to
+                begin.
               </p>
             </div>
           )}

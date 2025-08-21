@@ -1,11 +1,11 @@
 import React from 'react';
-import QuotesApp from './components/QuotesApp';
+import BiVerse from './BiVerse';
 import './index.css';
 
 function App() {
   return (
     <div className="App">
-      <QuotesApp />
+      <BiVerse />
     </div>
   );
 }
