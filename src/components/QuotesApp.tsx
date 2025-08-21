@@ -8,7 +8,6 @@ import {
   Copy, 
   RefreshCw, 
   BookOpen, 
-  Calendar,
   ChevronDown,
   Filter,
   Shuffle
@@ -32,28 +31,12 @@ const emotions = [
 
 
 
-const dailyVerses = [
-  {
-    Reference: "Jeremiah 29:11",
-    Verse: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, to give you hope and a future."
-  },
-  {
-    Reference: "Romans 8:28",
-    Verse: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose."
-  },
-  {
-    Reference: "Isaiah 40:31",
-    Verse: "But those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint."
-  }
-];
-
 const QuotesApp: React.FC = () => {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [versesData, setVersesData] = useState<Verse[]>([]);
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [displayVerse, setDisplayVerse] = useState<Verse | null>(null);
-  const [dailyVerse, setDailyVerse] = useState<Verse | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [favorites, setFavorites] = useState<Verse[]>([]);
   const [showFavorites, setShowFavorites] = useState(false);
@@ -70,10 +53,6 @@ const QuotesApp: React.FC = () => {
     // Initialize favorites without localStorage
     const savedFavorites: Verse[] = []; // Start with empty favorites
     setFavorites(savedFavorites);
-
-    // Set daily verse
-    const today = new Date().getDate();
-    setDailyVerse(dailyVerses[today % dailyVerses.length]);
 
     // Load verses data from imported JSON
     setVersesData(quotesData);
@@ -220,34 +199,14 @@ const QuotesApp: React.FC = () => {
         </button>
       </div>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-4 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Bi-Verse
           </h1>
-          <p className={`text-lg md:text-xl ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-            Find comfort and guidance through God's word
-          </p>
+          
         </div>
-
-        {/* Daily Verse */}
-        {dailyVerse && (
-          <div className={`mb-8 p-6 rounded-2xl shadow-lg transition-all duration-300 ${
-            theme === "dark" 
-              ? "bg-white/10 backdrop-blur-sm border border-white/20" 
-              : "bg-white/80 backdrop-blur-sm border border-gray-200"
-          }`}>
-            <div className="flex items-center gap-2 mb-3">
-              <Calendar className="text-blue-500" size={20} />
-              <h3 className="text-lg font-semibold">Verse of the Day</h3>
-            </div>
-            <p className={`text-lg italic mb-2 ${theme === "dark" ? "text-gray-200" : "text-gray-700"}`}>
-              "{dailyVerse.Verse}"
-            </p>
-            <p className="font-semibold text-blue-600">- {dailyVerse.Reference}</p>
-          </div>
-        )}
 
         {/* Search Section */}
         <div className={`mb-8 p-6 rounded-2xl shadow-lg transition-all duration-300 ${
